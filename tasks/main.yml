@@ -1,0 +1,44 @@
+---
+- name: Install curl package
+  package:
+    name: curl
+    state: present
+  become: true
+
+- name: Copy patchman-client script
+  copy:
+    src: patchman-client
+    dest: /usr/local/bin/patchman-client
+    mode: 0755
+    owner: root
+    group: root
+  become: true
+
+- name: Create patchman configuration directory
+  file:
+    state: directory
+    path: /etc/patchman
+    mode: 0755
+    owner: root
+    group: root
+  become: true
+
+- name: Copy patchman-client.conf configuration file
+  template:
+    src: patchman-client.conf.j2
+    dest: /etc/patchman/patchman-client.conf
+    mode: 0644
+    owner: root
+    group: root
+  become: true
+
+- name: Create patchman-client cronjob
+  cron:
+    name: "run patchman-client"
+    minute: "{{ patchman_client_cron_minute }}"
+    hour: "{{ patchman_client_cron_hour }}"
+    day: "{{ patchman_client_cron_day }}"
+    job: /usr/local/bin/patchman-client
+    cron_file: patchman-client
+    user: "{{ patchman_client_cron_user }}"
+  become: true
