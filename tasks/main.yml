@@ -42,3 +42,7 @@
     cron_file: patchman-client
     user: "{{ patchman_client_cron_user }}"
   become: true
+
+- name: Include update tasks
+  include_tasks: update.yml
+  when: patchman_client_update|bool
